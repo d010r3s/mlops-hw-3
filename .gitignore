@@ -1,0 +1,6 @@
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+clickhouse_data/
+output/result.csv
