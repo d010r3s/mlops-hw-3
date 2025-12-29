@@ -9,11 +9,25 @@ CSV_PATH = os.getenv("CSV_PATH", "/data/train.csv")
 
 REQUIRED_COLUMNS = ["transaction_time", "us_state", "cat_id", "amount"]
 
+def wait_for_kafka(bootstrap: str, timeout_s: int = 90) -> None:
+    host, port_str = bootstrap.split(":")
+    port = int(port_str)
+    start = time.time()
+    while time.time() - start < timeout_s:
+        try:
+            with socket.create_connection((host, port), timeout=3):
+                return
+        except OSError:
+            time.sleep(1)
+    raise RuntimeError(f"Kafka not available at {bootstrap} after {timeout_s}s")
+
 def main() -> None:
 
     df = pd.read_csv(CSV_PATH)
     missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
 
+    wait_for_kafka(BOOTSTRAP)
+    
     dt = pd.to_datetime(df["transaction_time"], errors="coerce")
     df["transaction_time"] = dt.dt.strftime("%Y-%m-%d %H:%M:%S")
 
