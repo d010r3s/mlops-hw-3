@@ -2,6 +2,8 @@ import os
 import json
 import pandas as pd
 from kafka import KafkaProducer
+import time
+import socket
 
 BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "kafka:9092")
 TOPIC = os.getenv("KAFKA_TOPIC", "transactions")
